@@ -6,11 +6,16 @@ import random
 import threading
 import time
 import os
+try:
+    import study
+except ImportError as e:
+    st.error(f"study 모듈을 불러올 수 없습니다: {e}")
+    study = None
 from typing import Dict, List, Any
 
 # 페이지 설정
 st.set_page_config(
-    page_title="미션 알람",
+    page_title="시험공부도우미",
     page_icon="⏰",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -436,15 +441,16 @@ def main():
     app = MissionAlarmApp()
     
     # 사이드바 네비게이션
-    st.sidebar.title("🎯 미션 알람")
+    st.sidebar.title("🎯 시험 공부 도우미")
     st.sidebar.markdown("---")
     
     # 페이지 선택
     pages = {
-        "📆 월간 일정": "calendar",
+        "📆 스케줄러": "calendar",
         "⏰ 알람 설정": "alarm", 
         "❓ 미션 퀴즈": "quiz",
-        "⚙️ 설정": "settings"
+        "⚙️ 설정": "settings",
+        "📙 공부 계획 도우미" : "study"
     }
     
     selected_page = st.sidebar.radio("페이지 선택", list(pages.keys()))
@@ -471,6 +477,12 @@ def main():
         show_quiz_page(app)
     elif page_key == "settings":
         show_settings_page(app)
+    elif page_key == "study":
+        if study is not None:
+            study.run_study_planner()
+        else:
+            st.error("스터디 모듈을 불러올 수 없습니다.")
+
 
 if __name__ == "__main__":
     main()
