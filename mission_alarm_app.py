@@ -6,6 +6,12 @@ import random
 import threading
 import time
 import os
+import re
+try:
+    import study
+except ImportError as e:
+    st.error(f"study 모듈을 불러올 수 없습니다: {e}")
+    study = None
 from typing import Dict, List, Any
 
 # 페이지 설정
@@ -430,6 +436,24 @@ def show_settings_page(app):
             except Exception as e:
                 st.error(f"파일 읽기 오류: {e}")
 
+def show_youtube_page():
+    st.header("▶️ YouTube 동영상")
+    st.write("여기에 YouTube 동영상을 삽입할 수 있습니다.")
+
+    youtube_url = st.text_input("YouTube 동영상 URL을 입력하세요:", key="youtube_url_input")
+
+    if youtube_url:
+        video_id_match = re.search(r"(?:v=|youtu\.be/|embed/|watch\?v=)([a-zA-Z0-9_-]{11})", youtube_url)
+        if video_id_match:
+            video_id = video_id_match.group(1)
+            st.video(f"https://www.youtube.com/watch?v={video_id}")
+        else:
+            st.error("유효한 YouTube 동영상 URL이 아닙니다.")
+
+def show_deadline_youtube_page():
+    st.header("▶️ 마감에 쫓길 때")
+    st.video("https://www.youtube.com/watch?v=C3p4QDW3-g8")
+
 def main():
     """메인 애플리케이션"""
     # 앱 초기화
@@ -444,7 +468,9 @@ def main():
         "📆 월간 일정": "calendar",
         "⏰ 알람 설정": "alarm", 
         "❓ 미션 퀴즈": "quiz",
-        "⚙️ 설정": "settings"
+        "⚙️ 설정": "settings",
+        "📙 스터디" : "study",
+        "▶️ 마감에 쫓길 때" : "deadline_youtube"
     }
     
     selected_page = st.sidebar.radio("페이지 선택", list(pages.keys()))
@@ -471,7 +497,19 @@ def main():
         show_quiz_page(app)
     elif page_key == "settings":
         show_settings_page(app)
+    elif page_key == "study":
+        if study is not None:
+            study.run_study_planner()
+        else:
+            st.error("스터디 모듈을 불러올 수 없습니다.")
+#    elif page_key == "youtube":
+#        show_youtube_page()
+    elif page_key == "deadline_youtube":
+        show_deadline_youtube_page()
+
 
 if __name__ == "__main__":
     main()
+
+
 
